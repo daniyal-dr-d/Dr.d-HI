@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. D's Official Entrance Exam</title>
+    <title>Dr. D's Official Mathematics Exam</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; text-align: center; color: #333; margin: 0; padding: 20px; }
         #game-container { max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -12,72 +12,78 @@
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         button { 
-            padding: 18px; 
-            font-size: 18px; 
-            cursor: pointer; 
-            border: 2px solid #3498db; 
-            background: white; 
-            border-radius: 12px; 
-            transition: all 0.2s ease;
-            font-weight: 600;
-            color: #2980b9;
+            padding: 18px; font-size: 18px; cursor: pointer; border: 2px solid #3498db; 
+            background: white; border-radius: 12px; transition: all 0.2s ease;
+            font-weight: 600; color: #2980b9;
         }
         
         button:hover { background: #3498db; color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3); }
-        button:active { transform: translateY(0); }
+        .success-btn { background: #27ae60; color: white; border: none; margin-top: 10px; width: 100%; }
 
         #dr-d-img { width: 180px; height: auto; margin-top: 25px; transition: all 0.3s ease; display: inline-block; }
         #feedback { margin-top: 15px; font-size: 18px; font-weight: bold; height: 25px; }
         .professor-zone { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+        #admin-reset { margin-top: 40px; display: block; color: #bdc3c7; font-size: 10px; text-decoration: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="game-container">
-        <div class="lives-display">Lives: <span id="lives-count">❤️ ❤️</span></div>
-        
-        <div id="quiz-area">
-            <div class="question-text" id="q-text">Exam Starting...</div>
-            <div class="options-grid" id="opt-container"></div>
-            <div id="feedback"></div>
+        <div id="main-content">
+            <div class="lives-display" id="lives-ui">Lives: <span id="lives-count">❤️ ❤️</span></div>
+            <div id="quiz-area">
+                <div class="question-text" id="q-text">Loading Math Exam...</div>
+                <div class="options-grid" id="opt-container"></div>
+                <div id="feedback"></div>
+            </div>
         </div>
 
         <div class="professor-zone">
             <img id="dr-d-img" src="drd_professor.png" alt="Dr. D">
-            <p id="dr-d-speech" style="font-style: italic; color: #555;">"Concentrate. No talking during the test!"</p>
+            <p id="dr-d-speech" style="font-style: italic; color: #555;">"Show me your mathematical precision."</p>
         </div>
+
+        <a id="admin-reset" onclick="adminReset()">Admin: Reset Progress</a>
     </div>
 
     <script>
-        let lives = 2;
-        let currentIdx = 0;
+        const hasPassed = localStorage.getItem('drd_math_passed') === 'true';
+        let lives = parseInt(localStorage.getItem('drd_lives')) || 2;
+        let currentIdx = parseInt(localStorage.getItem('drd_progress')) || 0;
 
+        // ALL MATH QUESTIONS
         const examData = [
             { q: "12 + 8 ÷ 2 - 3 = ?", opts: ["7", "10", "15", "13"], a: "13" },
             { q: "What is 25% of $40?", opts: ["$5", "$10", "$15", "$20"], a: "$10" },
             { q: "Which shape has 4 equal sides?", opts: ["Circle", "Triangle", "Square", "Hexagon"], a: "Square" },
-            { q: "Which of these is the formula for Density?", opts: ["Mass × Volume", "Mass ÷ Volume", "Weight + Area", "Speed ÷ Time"], a: "Mass ÷ Volume" },
-            { q: "Which force pulls objects toward Earth?", opts: ["Magnetism", "Friction", "Gravity", "Wind"], a: "Gravity" }
+            { q: "If the ratio of boys to girls is 3:2 and there are 10 girls, how many boys are there?", opts: ["12", "15", "20", "8"], a: "15" },
+            { q: "A car travels 120km in 2 hours. What is its speed?", opts: ["40km/h", "60km/h", "80km/h", "240km/h"], a: "60km/h" }
         ];
 
         function init() {
+            if (hasPassed) {
+                showVictoryScreen("MATHEMATICIAN VERIFIED");
+                return;
+            }
+
             if (lives <= 0) {
-                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#e74c3c;'>💀 EXAM FAILED</h2><p>Dr. D: 'You did not meet the requirements. Practice more.'</p><button onclick='location.reload()' style='background:#e74c3c; color:white;'>Retake Exam</button>";
+                document.getElementById("lives-ui").style.display = "none";
+                document.getElementById("quiz-area").innerHTML = "<h2>💀 EXAM FAILED</h2><p>Dr. D: 'Check your calculations and try again.'</p><button onclick='fullRestart()'>Retry Exam</button>";
                 document.getElementById("dr-d-img").src = "drd_open_mouth.png"; 
                 return;
             }
 
             if (currentIdx >= examData.length) {
-                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#27ae60;'>🏆 ADMITTED</h2><p>Dr. D: 'Welcome to Middle School, Architect. Well earned.'</p><button onclick='location.reload()' style='background:#27ae60; color:white;'>Reset</button>";
-                document.getElementById("dr-d-img").src = "drd_professor.png";
+                localStorage.setItem('drd_math_passed', 'true');
+                showVictoryScreen("EXAM PASSED");
                 return;
             }
 
+            document.getElementById("lives-count").innerText = "❤️ ".repeat(lives) || "💀";
             const data = examData[currentIdx];
             document.getElementById("q-text").innerText = data.q;
             const container = document.getElementById("opt-container");
             container.innerHTML = "";
-            
             document.getElementById("dr-d-img").src = "drd_professor.png";
             document.getElementById("feedback").innerText = "";
 
@@ -91,20 +97,42 @@
 
         function check(choice) {
             const feedbackEl = document.getElementById("feedback");
-            
             if (choice === examData[currentIdx].a) {
                 feedbackEl.innerText = "Correct.";
                 feedbackEl.style.color = "#27ae60";
             } else {
                 lives--;
-                document.getElementById("lives-count").innerText = "❤️ ".repeat(lives) || "💀";
                 feedbackEl.innerText = "Incorrect.";
                 feedbackEl.style.color = "#e74c3c";
                 document.getElementById("dr-d-img").src = "drd_open_mouth.png";
             }
 
             currentIdx++;
+            localStorage.setItem('drd_progress', currentIdx);
+            localStorage.setItem('drd_lives', lives);
             setTimeout(init, 1000);
+        }
+
+        function showVictoryScreen(title) {
+            document.getElementById("lives-ui").style.display = "none";
+            document.getElementById("quiz-area").innerHTML = `
+                <h2 style="color:#27ae60;">🏆 ${title}</h2>
+                <p>Dr. D: 'You have cleared the entrance exam. Access granted.'</p>
+                <button class="success-btn" onclick="window.location.href='https://your-main-site-link.com'">Enter Portal</button>
+            `;
+            document.getElementById("dr-d-img").src = "drd_professor.png";
+            document.getElementById("dr-d-speech").innerText = "Status: MATH GENIUS";
+        }
+
+        function fullRestart() {
+            localStorage.removeItem('drd_progress');
+            localStorage.removeItem('drd_lives');
+            location.reload();
+        }
+
+        function adminReset() {
+            localStorage.clear();
+            location.reload();
         }
 
         init();
