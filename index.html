@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. D's Education Hub</title>
+    <title>Dr. D's Official Entrance Exam</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; text-align: center; color: #333; margin: 0; padding: 20px; }
         #game-container { max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .lives-display { font-size: 28px; color: #e74c3c; margin-bottom: 20px; font-weight: bold; }
-        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 10px; min-height: 50px; }
-        #hint-text { font-size: 14px; color: #3498db; margin-bottom: 20px; font-style: italic; min-height: 20px; }
+        .lives-display { font-size: 28px; color: #e74c3c; margin-bottom: 25px; font-weight: bold; }
+        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 30px; min-height: 60px; color: #2c3e50; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         button { 
-            padding: 15px; 
+            padding: 18px; 
             font-size: 18px; 
             cursor: pointer; 
             border: 2px solid #3498db; 
@@ -21,6 +20,7 @@
             border-radius: 12px; 
             transition: all 0.2s ease;
             font-weight: 600;
+            color: #2980b9;
         }
         
         button:hover { background: #3498db; color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3); }
@@ -37,15 +37,14 @@
         <div class="lives-display">Lives: <span id="lives-count">❤️ ❤️</span></div>
         
         <div id="quiz-area">
-            <div class="question-text" id="q-text">Loading...</div>
-            <div id="hint-text"></div>
+            <div class="question-text" id="q-text">Exam Starting...</div>
             <div class="options-grid" id="opt-container"></div>
             <div id="feedback"></div>
         </div>
 
         <div class="professor-zone">
             <img id="dr-d-img" src="drd_professor.png" alt="Dr. D">
-            <p id="dr-d-speech" style="font-style: italic; color: #555;">"Let's see if you're ready for middle school!"</p>
+            <p id="dr-d-speech" style="font-style: italic; color: #555;">"Concentrate. No talking during the test!"</p>
         </div>
     </div>
 
@@ -53,31 +52,29 @@
         let lives = 2;
         let currentIdx = 0;
 
-        // UPDATED EXAM DATA - Q3 is now simpler!
         const examData = [
-            { q: "12 + 8 ÷ 2 - 3 = ?", hint: "Tip: Divide 8 by 2 first!", opts: ["7", "10", "15", "13"], a: "13" },
-            { q: "What is 25% of $40?", hint: "Tip: 25% is the same as 1/4 of the total.", opts: ["$5", "$10", "$15", "$20"], a: "$10" },
-            { q: "What is the AREA of a 5cm square?", hint: "Tip: Multiply side × side (5 × 5).", opts: ["10cm²", "20cm²", "25cm²", "50cm²"], a: "25cm²" },
-            { q: "Solve for x: 3x = 18", hint: "Tip: What number times 3 equals 18?", opts: ["3", "6", "9", "15"], a: "6" },
-            { q: "Which force pulls objects toward Earth?", hint: "Tip: It's why things fall down!", opts: ["Magnetism", "Friction", "Gravity", "Wind"], a: "Gravity" }
+            { q: "12 + 8 ÷ 2 - 3 = ?", opts: ["7", "10", "15", "13"], a: "13" },
+            { q: "What is 25% of $40?", opts: ["$5", "$10", "$15", "$20"], a: "$10" },
+            { q: "Which shape has 4 equal sides?", opts: ["Circle", "Triangle", "Square", "Hexagon"], a: "Square" },
+            { q: "Solve for x: 3x = 18", opts: ["3", "6", "9", "15"], a: "6" },
+            { q: "Which force pulls objects toward Earth?", opts: ["Magnetism", "Friction", "Gravity", "Wind"], a: "Gravity" }
         ];
 
         function init() {
             if (lives <= 0) {
-                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#e74c3c;'>💀 EXAM FAILED</h2><p>Dr. D: 'Study the basics and try again!'</p><button onclick='location.reload()' style='background:#e74c3c; color:white;'>Restart</button>";
+                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#e74c3c;'>💀 EXAM FAILED</h2><p>Dr. D: 'You did not meet the requirements. Practice more.'</p><button onclick='location.reload()' style='background:#e74c3c; color:white;'>Retake Exam</button>";
                 document.getElementById("dr-d-img").src = "drd_open_mouth.png"; 
                 return;
             }
 
             if (currentIdx >= examData.length) {
-                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#27ae60;'>🏆 ADMITTED!</h2><p>Dr. D: 'Welcome to Middle School!'</p><button onclick='location.reload()' style='background:#27ae60; color:white;'>Play Again</button>";
+                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#27ae60;'>🏆 ADMITTED</h2><p>Dr. D: 'Welcome to Middle School, Architect. Well earned.'</p><button onclick='location.reload()' style='background:#27ae60; color:white;'>Reset</button>";
                 document.getElementById("dr-d-img").src = "drd_professor.png";
                 return;
             }
 
             const data = examData[currentIdx];
             document.getElementById("q-text").innerText = data.q;
-            document.getElementById("hint-text").innerText = data.hint;
             const container = document.getElementById("opt-container");
             container.innerHTML = "";
             
@@ -96,13 +93,12 @@
             const feedbackEl = document.getElementById("feedback");
             
             if (choice === examData[currentIdx].a) {
-                feedbackEl.innerText = "Correct! Well done.";
+                feedbackEl.innerText = "Correct.";
                 feedbackEl.style.color = "#27ae60";
-                document.getElementById("dr-d-img").src = "drd_professor.png";
             } else {
                 lives--;
                 document.getElementById("lives-count").innerText = "❤️ ".repeat(lives) || "💀";
-                feedbackEl.innerText = "Incorrect! Keep going...";
+                feedbackEl.innerText = "Incorrect.";
                 feedbackEl.style.color = "#e74c3c";
                 document.getElementById("dr-d-img").src = "drd_open_mouth.png";
             }
