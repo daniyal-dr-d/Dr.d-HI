@@ -5,15 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dr. D's Education Hub</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; text-align: center; color: #333; }
-        #game-container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .lives-display { font-size: 24px; color: #e74c3c; margin-bottom: 20px; }
-        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; text-align: center; color: #333; margin: 0; padding: 20px; }
+        #game-container { max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .lives-display { font-size: 28px; color: #e74c3c; margin-bottom: 20px; font-weight: bold; }
+        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 25px; min-height: 60px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        button { padding: 15px; font-size: 18px; cursor: pointer; border: 2px solid #3498db; background: white; border-radius: 10px; transition: 0.3s; }
-        button:hover { background: #3498db; color: white; transform: translateY(-2px); }
-        #dr-d-img { width: 180px; margin-top: 20px; transition: transform 0.2s; }
-        #feedback { margin-top: 15px; font-style: italic; color: #7f8c8d; height: 20px; }
+        
+        button { 
+            padding: 15px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            border: 2px solid #3498db; 
+            background: white; 
+            border-radius: 12px; 
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+        
+        button:hover { background: #3498db; color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3); }
+        button:active { transform: translateY(0); }
+
+        #dr-d-img { width: 180px; margin-top: 25px; transition: all 0.3s ease; }
+        #feedback { margin-top: 15px; font-size: 18px; font-weight: bold; height: 25px; }
+        .professor-zone { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
     </style>
 </head>
 <body>
@@ -22,14 +36,14 @@
         <div class="lives-display">Lives: <span id="lives-count">❤️ ❤️</span></div>
         
         <div id="quiz-area">
-            <div class="question-text" id="q-text">Loading Exam...</div>
+            <div class="question-text" id="q-text">Ready to begin?</div>
             <div class="options-grid" id="opt-container"></div>
             <div id="feedback"></div>
         </div>
 
         <div class="professor-zone">
             <img id="dr-d-img" src="drd_professor.png" alt="Dr. D">
-            <p id="dr-d-speech">"Hello, Architect! Let's begin the evaluation."</p>
+            <p id="dr-d-speech" style="font-style: italic; color: #555;">"Let's see if you're ready for middle school!"</p>
         </div>
     </div>
 
@@ -41,18 +55,24 @@
             { q: "12 + 8 ÷ 2 - 3 = ?", opts: ["7", "10", "15", "13"], a: "13" },
             { q: "What is 25% of $40?", opts: ["$5", "$10", "$15", "$20"], a: "$10" },
             { q: "Solve for x: 3x = 18", opts: ["3", "6", "9", "15"], a: "6" },
-            { q: "Which gas do plants need for photosynthesis?", opts: ["Oxygen", "Nitrogen", "CO2", "Helium"], a: "CO2" }
+            { q: "How many faces does a standard cube have?", opts: ["4", "6", "8", "12"], a: "6" },
+            { q: "Which force pulls objects toward Earth?", opts: ["Magnetism", "Friction", "Gravity", "Air Resistance"], a: "Gravity" }
         ];
 
         function init() {
+            // Check for Game Over (0 lives)
             if (lives <= 0) {
-                document.getElementById("quiz-area").innerHTML = "<h2>💀 MISSION FAILED</h2><p>Dr. D: Study harder and return!</p>";
+                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#e74c3c;'>💀 EXAM FAILED</h2><p>Dr. D: 'You need more practice, Architect!'</p><button onclick='location.reload()' style='background:#e74c3c; color:white;'>Retry Entrance Exam</button>";
                 document.getElementById("dr-d-img").src = "drd_open_mouth.png"; 
+                document.getElementById("dr-d-speech").innerText = "Better luck next time!";
                 return;
             }
+
+            // Check for Victory (Finished all questions)
             if (currentIdx >= examData.length) {
-                document.getElementById("quiz-area").innerHTML = "<h2>🏆 MASTER ARCHITECT</h2><p>You are ready for Middle School!</p>";
+                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#27ae60;'>🏆 ADMITTED!</h2><p>Dr. D: 'Welcome to Middle School, Architect!'</p><button onclick='location.reload()' style='background:#27ae60; color:white;'>Play Again</button>";
                 document.getElementById("dr-d-img").src = "drd_professor.png";
+                document.getElementById("dr-d-speech").innerText = "Business is booming!";
                 return;
             }
 
@@ -60,7 +80,10 @@
             document.getElementById("q-text").innerText = data.q;
             const container = document.getElementById("opt-container");
             container.innerHTML = "";
+            
+            // Reset Dr. D face and feedback
             document.getElementById("dr-d-img").src = "drd_professor.png";
+            document.getElementById("feedback").innerText = "";
 
             data.opts.forEach(opt => {
                 const btn = document.createElement("button");
@@ -71,19 +94,28 @@
         }
 
         function check(choice) {
+            const feedbackEl = document.getElementById("feedback");
+            
             if (choice === examData[currentIdx].a) {
-                document.getElementById("feedback").innerText = "Excellent logic!";
-                currentIdx++;
-                setTimeout(init, 800);
+                feedbackEl.innerText = "Correct! Well done.";
+                feedbackEl.style.color = "#27ae60";
+                document.getElementById("dr-d-img").src = "drd_professor.png";
             } else {
                 lives--;
                 document.getElementById("lives-count").innerText = "❤️ ".repeat(lives) || "💀";
-                document.getElementById("dr-d-img").src = "drd_open_mouth.png";
-                document.getElementById("feedback").innerText = "Incorrect! Think carefully.";
-                if (lives <= 0) setTimeout(init, 800);
+                feedbackEl.innerText = "Incorrect! Moving to next...";
+                feedbackEl.style.color = "#e74c3c";
+                document.getElementById("dr-d-img").src = "drd_open_mouth.png"; // Reaction
             }
+
+            // Always move to next index
+            currentIdx++;
+
+            // Wait 1 second so they see the result/face-swap before the next question
+            setTimeout(init, 1000);
         }
 
+        // Start the game
         init();
     </script>
 </body>
