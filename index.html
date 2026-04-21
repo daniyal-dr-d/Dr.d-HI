@@ -6,9 +6,10 @@
     <title>Dr. D's Education Hub</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; text-align: center; color: #333; margin: 0; padding: 20px; }
-        #game-container { max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        #game-container { max-width: 600px; margin: 20px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .lives-display { font-size: 28px; color: #e74c3c; margin-bottom: 20px; font-weight: bold; }
-        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 25px; min-height: 60px; }
+        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 10px; min-height: 50px; }
+        #hint-text { font-size: 14px; color: #3498db; margin-bottom: 20px; font-style: italic; min-height: 20px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         button { 
@@ -36,7 +37,8 @@
         <div class="lives-display">Lives: <span id="lives-count">❤️ ❤️</span></div>
         
         <div id="quiz-area">
-            <div class="question-text" id="q-text">Ready to begin?</div>
+            <div class="question-text" id="q-text">Loading...</div>
+            <div id="hint-text"></div>
             <div class="options-grid" id="opt-container"></div>
             <div id="feedback"></div>
         </div>
@@ -51,37 +53,34 @@
         let lives = 2;
         let currentIdx = 0;
 
+        // UPDATED EXAM DATA - Q3 is now simpler!
         const examData = [
-            { q: "12 + 8 ÷ 2 - 3 = ?", opts: ["7", "10", "15", "13"], a: "13" },
-            { q: "What is 25% of $40?", opts: ["$5", "$10", "$15", "$20"], a: "$10" },
-            { q: "Solve for x: 3x = 18", opts: ["3", "6", "9", "15"], a: "6" },
-            { q: "How many faces does a standard cube have?", opts: ["4", "6", "8", "12"], a: "6" },
-            { q: "Which force pulls objects toward Earth?", opts: ["Magnetism", "Friction", "Gravity", "Air Resistance"], a: "Gravity" }
+            { q: "12 + 8 ÷ 2 - 3 = ?", hint: "Tip: Divide 8 by 2 first!", opts: ["7", "10", "15", "13"], a: "13" },
+            { q: "What is 25% of $40?", hint: "Tip: 25% is the same as 1/4 of the total.", opts: ["$5", "$10", "$15", "$20"], a: "$10" },
+            { q: "What is the AREA of a 5cm square?", hint: "Tip: Multiply side × side (5 × 5).", opts: ["10cm²", "20cm²", "25cm²", "50cm²"], a: "25cm²" },
+            { q: "Solve for x: 3x = 18", hint: "Tip: What number times 3 equals 18?", opts: ["3", "6", "9", "15"], a: "6" },
+            { q: "Which force pulls objects toward Earth?", hint: "Tip: It's why things fall down!", opts: ["Magnetism", "Friction", "Gravity", "Wind"], a: "Gravity" }
         ];
 
         function init() {
-            // Check for Game Over (0 lives)
             if (lives <= 0) {
-                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#e74c3c;'>💀 EXAM FAILED</h2><p>Dr. D: 'You need more practice, Architect!'</p><button onclick='location.reload()' style='background:#e74c3c; color:white;'>Retry Entrance Exam</button>";
+                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#e74c3c;'>💀 EXAM FAILED</h2><p>Dr. D: 'Study the basics and try again!'</p><button onclick='location.reload()' style='background:#e74c3c; color:white;'>Restart</button>";
                 document.getElementById("dr-d-img").src = "drd_open_mouth.png"; 
-                document.getElementById("dr-d-speech").innerText = "Better luck next time!";
                 return;
             }
 
-            // Check for Victory (Finished all questions)
             if (currentIdx >= examData.length) {
-                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#27ae60;'>🏆 ADMITTED!</h2><p>Dr. D: 'Welcome to Middle School, Architect!'</p><button onclick='location.reload()' style='background:#27ae60; color:white;'>Play Again</button>";
+                document.getElementById("quiz-area").innerHTML = "<h2 style='color:#27ae60;'>🏆 ADMITTED!</h2><p>Dr. D: 'Welcome to Middle School!'</p><button onclick='location.reload()' style='background:#27ae60; color:white;'>Play Again</button>";
                 document.getElementById("dr-d-img").src = "drd_professor.png";
-                document.getElementById("dr-d-speech").innerText = "Business is booming!";
                 return;
             }
 
             const data = examData[currentIdx];
             document.getElementById("q-text").innerText = data.q;
+            document.getElementById("hint-text").innerText = data.hint;
             const container = document.getElementById("opt-container");
             container.innerHTML = "";
             
-            // Reset Dr. D face and feedback
             document.getElementById("dr-d-img").src = "drd_professor.png";
             document.getElementById("feedback").innerText = "";
 
@@ -103,19 +102,15 @@
             } else {
                 lives--;
                 document.getElementById("lives-count").innerText = "❤️ ".repeat(lives) || "💀";
-                feedbackEl.innerText = "Incorrect! Moving to next...";
+                feedbackEl.innerText = "Incorrect! Keep going...";
                 feedbackEl.style.color = "#e74c3c";
-                document.getElementById("dr-d-img").src = "drd_open_mouth.png"; // Reaction
+                document.getElementById("dr-d-img").src = "drd_open_mouth.png";
             }
 
-            // Always move to next index
             currentIdx++;
-
-            // Wait 1 second so they see the result/face-swap before the next question
             setTimeout(init, 1000);
         }
 
-        // Start the game
         init();
     </script>
 </body>
