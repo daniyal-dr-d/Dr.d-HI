@@ -1,66 +1,90 @@
-<script>
-    let lives = 2;
-    let currentQuestion = 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. D's Education Hub</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; text-align: center; color: #333; }
+        #game-container { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .lives-display { font-size: 24px; color: #e74c3c; margin-bottom: 20px; }
+        .question-text { font-size: 22px; font-weight: bold; margin-bottom: 20px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button { padding: 15px; font-size: 18px; cursor: pointer; border: 2px solid #3498db; background: white; border-radius: 10px; transition: 0.3s; }
+        button:hover { background: #3498db; color: white; transform: translateY(-2px); }
+        #dr-d-img { width: 180px; margin-top: 20px; transition: transform 0.2s; }
+        #feedback { margin-top: 15px; font-style: italic; color: #7f8c8d; height: 20px; }
+    </style>
+</head>
+<body>
 
-    // YOUR EXAM DATA
-    const questions = [
-        { q: "12 + 8 ÷ 2 - 3 = ?", options: ["7", "10", "15", "13"], answer: "13" },
-        { q: "What is 25% of $40?", options: ["$5", "$10", "$15", "$20"], answer: "$10" },
-        { q: "Solve for x: 3x = 18", options: ["3", "6", "9", "15"], answer: "6" },
-        { q: "How many faces does a cube have?", options: ["4", "6", "8", "12"], answer: "6" }
-    ];
-
-    function loadQuestion() {
-        // Reset Dr. D to his happy face at the start of each question
-        document.getElementById("dr-d-img").src = "drd_professor.png";
+    <div id="game-container">
+        <div class="lives-display">Lives: <span id="lives-count">❤️ ❤️</span></div>
         
-        if (lives <= 0) {
-            document.getElementById("game-container").innerHTML = "<h1>❌ GAME OVER</h1><p>Dr. D: 'Time for more practice!'</p><button onclick='location.reload()'>Restart Exam</button>";
-            return;
-        }
+        <div id="quiz-area">
+            <div class="question-text" id="q-text">Loading Exam...</div>
+            <div class="options-grid" id="opt-container"></div>
+            <div id="feedback"></div>
+        </div>
 
-        if (currentQuestion >= questions.length) {
-            document.getElementById("game-container").innerHTML = "<h1>🏆 MASTER ARCHITECT</h1><p>Business is booming! You passed!</p>";
-            return;
-        }
+        <div class="professor-zone">
+            <img id="dr-d-img" src="drd_professor.png" alt="Dr. D">
+            <p id="dr-d-speech">"Hello, Architect! Let's begin the evaluation."</p>
+        </div>
+    </div>
 
-        let qData = questions[currentQuestion];
-        document.getElementById("question-text").innerText = qData.q;
-        const optionsDiv = document.getElementById("options");
-        optionsDiv.innerHTML = "";
+    <script>
+        let lives = 2;
+        let currentIdx = 0;
 
-        qData.options.forEach(opt => {
-            let btn = document.createElement("button");
-            btn.innerText = opt;
-            btn.className = "game-btn"; // You can style this in CSS
-            btn.onclick = () => checkAnswer(opt);
-            optionsDiv.appendChild(btn);
-        });
-    }
+        const examData = [
+            { q: "12 + 8 ÷ 2 - 3 = ?", opts: ["7", "10", "15", "13"], a: "13" },
+            { q: "What is 25% of $40?", opts: ["$5", "$10", "$15", "$20"], a: "$10" },
+            { q: "Solve for x: 3x = 18", opts: ["3", "6", "9", "15"], a: "6" },
+            { q: "Which gas do plants need for photosynthesis?", opts: ["Oxygen", "Nitrogen", "CO2", "Helium"], a: "CO2" }
+        ];
 
-    function checkAnswer(choice) {
-        if (choice === questions[currentQuestion].answer) {
-            document.getElementById("message").innerText = "Correct! Dr. D is impressed.";
-            currentQuestion++;
-            setTimeout(loadQuestion, 1000);
-        } else {
-            lives--;
-            updateLives();
-            // TRIGGER REACTION: Switch to the open-mouth image
-            document.getElementById("dr-d-img").src = "drd_open_mouth.png";
-            document.getElementById("message").innerText = "Ouch! That's a life lost.";
-            
+        function init() {
             if (lives <= 0) {
-                setTimeout(loadQuestion, 1000);
+                document.getElementById("quiz-area").innerHTML = "<h2>💀 MISSION FAILED</h2><p>Dr. D: Study harder and return!</p>";
+                document.getElementById("dr-d-img").src = "drd_open_mouth.png"; 
+                return;
+            }
+            if (currentIdx >= examData.length) {
+                document.getElementById("quiz-area").innerHTML = "<h2>🏆 MASTER ARCHITECT</h2><p>You are ready for Middle School!</p>";
+                document.getElementById("dr-d-img").src = "drd_professor.png";
+                return;
+            }
+
+            const data = examData[currentIdx];
+            document.getElementById("q-text").innerText = data.q;
+            const container = document.getElementById("opt-container");
+            container.innerHTML = "";
+            document.getElementById("dr-d-img").src = "drd_professor.png";
+
+            data.opts.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.innerText = opt;
+                btn.onclick = () => check(opt);
+                container.appendChild(btn);
+            });
+        }
+
+        function check(choice) {
+            if (choice === examData[currentIdx].a) {
+                document.getElementById("feedback").innerText = "Excellent logic!";
+                currentIdx++;
+                setTimeout(init, 800);
+            } else {
+                lives--;
+                document.getElementById("lives-count").innerText = "❤️ ".repeat(lives) || "💀";
+                document.getElementById("dr-d-img").src = "drd_open_mouth.png";
+                document.getElementById("feedback").innerText = "Incorrect! Think carefully.";
+                if (lives <= 0) setTimeout(init, 800);
             }
         }
-    }
 
-    function updateLives() {
-        let icons = "";
-        for(let i=0; i<lives; i++) icons += "❤️ ";
-        document.getElementById("lives").innerText = icons || "💀";
-    }
-
-    loadQuestion();
-</script>
+        init();
+    </script>
+</body>
+</html>
