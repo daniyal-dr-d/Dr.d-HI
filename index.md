@@ -25,7 +25,9 @@ Do you have what it takes to join the top tier of students? Our **Entry Evaluati
 ## ⚡ Are you ready to begin?
 Click the link below to face the evaluation. Remember: **You only have 2 lives.**
 
-## 👉 [START THE ENTRY TEST](entry%20test.html)
+## 👉 [proceed](entry%20test.html)
+# sve palestine
 
+<img src="https://stationers.pk/cdn/shop/files/image_7.jpg?v=1742549335" alt="Buy Palestine Flag 15x22cm Online In Pakistan | Stationers.pk"/>
 ---
 *© 2026 Dr.D-HI Academy | Built for the next generation of Architects.*
