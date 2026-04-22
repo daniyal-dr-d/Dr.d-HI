@@ -28,6 +28,6 @@ Click the link below to face the evaluation. Remember: **You only have 2 lives.*
 ## 👉 [proceed](entry%20test.html)
 # sve palestine
 
-<img src="https://stationers.pk/cdn/shop/files/image_7.jpg?v=1742549335" alt="Buy Palestine Flag 15x22cm Online In Pakistan | Stationers.pk"/>
+<img src="https://stationers.pk/cdn/shop/files/image_7.jpg?v=1742549335" alt="Buy Palestine Flag 7.5x11cm Online In Pakistan | Stationers.pk"/>
 ---
 *© 2026 Dr.D-HI Academy | Built for the next generation of Architects.*
